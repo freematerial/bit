@@ -1,0 +1,326 @@
+✅ PRACTICAL TEST 1: Deploying a Single VM for Internal Web Tool
+Aim
+To deploy a highly available, low-latency, scalable VM on Google Cloud for 200 concurrent users accessing an internal web tool.
+
+Requirements
+Google Cloud Platform account
+
+Compute Engine enabled
+
+Operating system image (e.g., Ubuntu 20.04 LTS)
+
+Firewall configuration for HTTP/HTTPS
+
+Browser with internet access
+
+Algorithm
+Choose region and zone closest to users (e.g., us-central1).
+
+Select machine type based on estimated load (e.g., e2-standard-4).
+
+Choose operating system (Ubuntu, CentOS, etc.).
+
+Allow HTTP/HTTPS firewall rules.
+
+Enable automatic restart for availability.
+
+Launch and test the VM.
+
+Procedure
+Navigate to Google Cloud Console > Compute Engine > VM Instances.
+
+Click Create Instance.
+
+Set a name like internal-web-server.
+
+Choose Region: us-central1, Zone: us-central1-a.
+
+Choose machine type: e2-standard-4 (4 vCPUs, 16 GB RAM).
+
+Under Boot Disk, select Ubuntu 20.04 LTS.
+
+Under Firewall, check Allow HTTP traffic and Allow HTTPS traffic.
+
+Expand Management, Security, Disks, Networking, Sole Tenancy:
+
+Under Availability policies, enable Automatic restart.
+
+Click Create.
+
+Once VM is running, note the external IP to test the server.
+
+Output
+A running virtual machine with firewall rules for web traffic, suitable for internal use.
+
+Result
+High-availability web tool server is ready to accept up to 200 concurrent internal users.
+
+✅ PRACTICAL TEST 2: Load-Balanced, Autoscaled VMs
+Aim
+To deploy multiple identical VMs behind a load balancer that autoscale based on CPU usage.
+
+Requirements
+Google Cloud account
+
+Compute Engine access
+
+Startup script (optional)
+
+Load Balancing and Instance Group
+
+Algorithm
+Create an instance template.
+
+Create a managed instance group (MIG).
+
+Enable autoscaling based on CPU.
+
+Create an HTTP(S) load balancer.
+
+Attach MIG to backend service.
+
+Procedure
+Step 1: Create Instance Template
+
+Go to Compute Engine > Instance Templates.
+
+Click Create Instance Template.
+
+Use Ubuntu image, machine type e2-medium.
+
+Optional: Add startup script to auto-install Apache/Nginx.
+
+bash
+Copy
+Edit
+#! /bin/bash
+sudo apt update
+sudo apt install -y apache2
+sudo systemctl start apache2
+Step 2: Create Managed Instance Group
+
+Go to Instance Groups > Create Group.
+
+Use the template above.
+
+Choose Single zone or Regional for better availability.
+
+Enable Autoscaling:
+
+Based on CPU utilization > target: 60%
+
+Min instances: 1, Max: 5
+
+Step 3: Create Load Balancer
+
+Go to Network Services > Load Balancing > Create Load Balancer.
+
+Choose HTTP(S) Load Balancer (classic).
+
+Configure:
+
+Backend: Use the Managed Instance Group.
+
+Frontend: Create HTTP frontend using ephemeral IP.
+
+Finalize and test via browser using IP.
+
+Output
+Autoscaled and load-balanced web servers with dynamic scaling and high availability.
+
+Result
+Traffic is evenly distributed; server count auto-adjusts per demand.
+
+✅ PRACTICAL TEST 3: Secure Cloud Storage for Image Uploads
+Aim
+To create a Cloud Storage bucket for private image storage, accessible only by a service account.
+
+Requirements
+Google Cloud Console access
+
+gsutil CLI
+
+IAM role management
+
+Algorithm
+Create a bucket in us-central1.
+
+Enable Uniform bucket-level access.
+
+Disable public access.
+
+Grant read/write to service account.
+
+Test access using gsutil.
+
+Procedure (Console)
+Go to Cloud Storage > Create Bucket.
+
+Name it uniquely: img-upload-bucket-xyz.
+
+Select region: us-central1.
+
+Choose Standard storage class.
+
+Disable public access:
+
+Enforce “Uniform bucket-level access”
+
+Disable “Public access”
+
+Create the bucket.
+
+Go to Permissions > Add Principal:
+
+Add web app service account: service-account@project.iam.gserviceaccount.com
+
+Role: Storage Object Admin
+
+Save.
+
+Procedure (gsutil)
+bash
+Copy
+Edit
+# Create bucket
+gsutil mb -c standard -l us-central1 gs://img-upload-bucket-xyz
+
+# Set uniform access
+gsutil uniformbucketlevelaccess set on gs://img-upload-bucket-xyz
+
+# Add IAM permissions
+gsutil iam ch serviceAccount:YOUR_SERVICE_ACCOUNT_EMAIL:objectAdmin gs://img-upload-bucket-xyz
+Output
+A private storage bucket only accessible by the application.
+
+Result
+Secure object storage that meets privacy and compliance needs.
+
+✅ PRACTICAL TEST 4: MySQL Database with Secure Access
+Aim
+To deploy a MySQL Cloud SQL instance, configure restricted access, and securely store credentials.
+
+Requirements
+GCP SQL API enabled
+
+App server IP or VPC
+
+Secret Manager
+
+Algorithm
+Create MySQL instance.
+
+Set DB version and resources.
+
+Authorize app server IP/VPC.
+
+Create user and DB.
+
+Store credentials securely.
+
+Procedure
+Go to SQL > Create Instance > MySQL.
+
+Set:
+
+Name: prod-db
+
+Version: MySQL 8.0
+
+Region: us-central1
+
+Machine type: db-f1-micro or higher
+
+Storage: SSD, 10 GB, auto increase
+
+Set root password.
+
+Authorize app server IP (e.g., 203.0.113.10/32) or use VPC connector.
+
+After creation:
+
+Databases > Create: user_data
+
+Users > Create: app_user
+
+Use Secret Manager:
+
+bash
+Copy
+Edit
+echo -n 'DB_PASSWORD' | gcloud secrets create mysql-password --data-file=-
+In app code, fetch secret:
+
+python
+Copy
+Edit
+from google.cloud import secretmanager
+client = secretmanager.SecretManagerServiceClient()
+secret = client.access_secret_version(request={"name": "projects/YOUR_PROJECT/secrets/mysql-password/versions/latest"})
+db_password = secret.payload.data.decode("UTF-8")
+Output
+Cloud SQL instance with secure, restricted access and credential management.
+
+Result
+Production-ready secure backend for MySQL-based applications.
+
+✅ PRACTICAL TEST 5: Secure VPC without Internet
+Aim
+To build a secure internal network on GCP with no internet access.
+
+Requirements
+VPC with internal IPs
+
+Private Google Access (optional)
+
+Firewall rules
+
+Algorithm
+Create custom VPC.
+
+Add subnet with internal range.
+
+Create VM without external IP.
+
+Add firewall rules for internal traffic.
+
+Enable Private Google Access if needed.
+
+Procedure
+Go to VPC networks > Create VPC:
+
+Name: internal-secure-vpc
+
+Mode: Custom
+
+Add subnet:
+
+Name: internal-subnet
+
+Region: us-central1
+
+IP range: 10.0.0.0/24
+
+Enable Private Google Access
+
+Create VM:
+
+Use above VPC and subnet
+
+Under Networking > External IP: select None
+
+Go to Firewall Rules:
+
+Allow tcp:22, tcp:80, tcp:443 from 10.0.0.0/24
+
+Deny egress to 0.0.0.0/0 (unless needed for update proxies)
+
+Validate VM connectivity:
+
+SSH from internal bastion or VPC-connected resource
+
+Output
+Private VM in a secure network with no external exposure.
+
+Result
+Highly secure deployment suitable for sensitive applications.
