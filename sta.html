@@ -31,12 +31,10 @@ html
 
 login.js
 
-var attempt = 3; // Variable to count number of attempts
-
+var attempt = 3;
 function validate() {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
-
     if (username === "Form" && password === "123") {
         alert("Login successfully");
         window.location = "success.html"; // Redirecting to another page
@@ -44,8 +42,6 @@ function validate() {
     } else {
         attempt--; // Decrementing by one
         alert("You have left " + attempt + " attempt(s);");
-
-        // Disabling fields after 3 attempts
         if (attempt === 0) {
             document.getElementById("username").disabled = true;
             document.getElementById("password").disabled = true;
@@ -198,14 +194,12 @@ driver.findElement(By.xpath("//p[@id='add_to_cart']//span[.='Add to cart']")).cl
 driver.findElement(By.xpath("/html//div[@id='layer_cart']//a[@title='Proceed to checkout']/span")).click();//Checkout page Proceed
 driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[3]/div/p[2]/a[1]/span")).click();
 driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[3]/div/form/p/button/span")).click();
-//Agree terms&Conditions
 driver.findElement(By.xpath("//*[@id=\"cgv\"]")).click();
 driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[3]/div/div/form/p/button/span")).click();//Click on Payby Check
 driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[3]/div/div/div[3]/div[2]/div/p/a")).click();//Confirm the order
 driver.findElement(By.xpath("/html/body/div[1]/div[2]/div/div[3]/div/form/p/button/span")).click();
 //Get Text
 String ConfirmationText=driver.findElement(By.xpath("//div[@id='center_column']/p[@class='alertalert-success']")).getText();
-// Verify that Product is ordered
 if(ConfirmationText.contains("complete"))
 { System.out.println("Order Completed: Test Case Passed");}
 else {
